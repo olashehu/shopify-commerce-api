@@ -25,9 +25,17 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Post('create')
+  @Post('user/signin')
   signUp(@Body() data: UserDTO) {
+    console.log(data, 'user/signin');
     return this.authService.createUser(data);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post('seller/signin')
+  signUpBuyer(@Body() data: UserDTO) {
+    console.log(data, 'user/seller');
+    return this.authService.createSeller(data);
   }
 
   @UseGuards(AuthGuard)

@@ -6,13 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { ProductsModule } from './products/products.module';
+// import { AuthMiddleware } from './middleware/auth.middleware';
 
 dotenv.config();
 
 @Module({
   imports: [
-    AuthModule,
-    ProductsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.HOST,
@@ -24,6 +23,8 @@ dotenv.config();
       entities: [path.join(__dirname, '**', '*.model.{js,ts}')],
       synchronize: true,
     }),
+    AuthModule,
+    ProductsModule,
   ],
   controllers: [UserController],
   providers: [UserService],
