@@ -16,6 +16,7 @@ import * as bcrypt from 'bcrypt';
 import * as shortid from 'shortid';
 import { User } from 'src/models/user.model';
 import { UserDTO } from 'src/user/dto/user.dto';
+import { UserRole } from 'src/models/user.model';
 
 @Injectable()
 export class AuthService {
@@ -52,14 +53,7 @@ export class AuthService {
       const isMatch = await bcrypt.compare(password, isEmail?.password);
 
       if (!isMatch) {
-        // return { status: 400, error: 'Email or password already exist' };
-        throw new HttpException(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: 'Email or password not match',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
+        return { status: 400, error: 'Email or password not match' };
       }
 
       const payload = { sub: isEmail.id, username: isEmail.userName };
@@ -73,36 +67,45 @@ export class AuthService {
 
   async createUser(data: UserDTO) {
     try {
-      console.log(data, 'data');
-      const [isEmail, isPhoneNumber] = await Promise.all([
-        this.userRepo.findOne({
-          where: {
-            email: data.email,
-          },
-        }),
-        this.userRepo.findOne({
-          where: {
-            phoneNumber: data.phoneNumber,
-          },
-        }),
-      ]);
-
-      if (isEmail || isPhoneNumber) {
-        return {
-          status: HttpStatus.CONFLICT,
-          error: 'Email or phone number already been taken!',
-        };
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(data.password, salt);
-
       const user = await this.userRepo.save({
         id: shortid(),
         userName: data.userName,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        password: hashedPassword,
+        password: data.password,
+        isActive: true,
+      });
+      const payload = { sub: user.id, username: user.userName };
+      return {
+        usaername: user.userName,
+        access_token: await this.jwtService.signAsync(payload),
+      };
+    } catch (err) {
+      let status = HttpStatus.INTERNAL_SERVER_ERROR;
+      let error = 'Internal server error';
+      if (err.status === HttpStatus.NOT_FOUND) {
+        status = HttpStatus.NOT_FOUND;
+        error = err.response.error;
+      }
+      throw new HttpException(
+        {
+          status,
+          error,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async createSeller(data: UserDTO) {
+    try {
+      const user = await this.userRepo.save({
+        id: shortid(),
+        userName: data.userName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        role: UserRole.SELLER,
+        password: data.password,
         isActive: true,
       });
       const payload = { sub: user.id, username: user.userName };
