@@ -6,8 +6,11 @@ import { ProductsModule } from './products/products.module';
 import { OrdersController } from './orders/orders.controller';
 import { OrdersService } from './orders/orders.service';
 import { OrdersModule } from './orders/orders.module';
+// import { FileUploadModule } from './file-upload/file-upload.module';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import { UploadModule } from './upload/upload.module';
+// import { CloudinaryModule } from './cloundinary/cloudinary.module';
 
 dotenv.config();
 
@@ -24,9 +27,12 @@ dotenv.config();
       entities: [path.join(__dirname, '**', '*.model.{js,ts}')],
       synchronize: true,
     }),
+    // CloudinaryModule,
+    UploadModule,
     AuthModule,
     ProductsModule,
     OrdersModule,
+    // FileUploadModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

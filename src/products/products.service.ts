@@ -18,9 +18,9 @@ export class ProductsService implements OnModuleInit {
     this.productsRepo = this.entityManager.getRepository(ProductsModel);
   }
 
-  async onModuleInit() {
+  onModuleInit() {
     console.log('Seeding data on startup...');
-    await this.seedProducts();
+    // await this.seedProducts();
   }
 
   private async seedProducts(): Promise<void> {

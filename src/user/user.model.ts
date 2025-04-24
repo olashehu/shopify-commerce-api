@@ -1,4 +1,11 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { OrderModel } from 'src/orders/order.model';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -32,6 +39,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToMany(() => OrderModel, (order) => order.user)
+  user: OrderModel[];
 
   @CreateDateColumn()
   createdAt: Date;

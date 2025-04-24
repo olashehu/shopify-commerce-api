@@ -10,7 +10,7 @@ import * as dotenv from 'dotenv';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { User } from 'src/user/user.model';
-import { AuthMiddleware } from './middleware/auth.middleware';
+import { AuthMiddleware } from 'src/middleware/auth.middleware';
 
 dotenv.config();
 

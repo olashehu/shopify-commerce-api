@@ -1,4 +1,11 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { OrderModel } from 'src/orders/order.model';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class ProductsModel {
@@ -25,6 +32,9 @@ export class ProductsModel {
 
   @Column('simple-array', { nullable: true })
   images: string[];
+
+  @OneToMany(() => OrderModel, (order) => order.product)
+  orders: OrderModel[];
 
   @CreateDateColumn()
   createdAt: Date;

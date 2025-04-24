@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
@@ -40,24 +41,25 @@ export class OrdersService {
       const productIds = data.items.map((pid) => pid.productId);
       const products = await this.productRepo.findBy({ id: In(productIds) });
 
-      const orders = this.orderRepo.create({
-        id: shortid(),
-        user: user,
-        status: 'PENDING',
-      });
-      await this.orderRepo.save(orders);
-
       for (const item of data.items) {
         const product = products.find((p) => p.id === item.productId);
         if (!product) throw new BadRequestException('Product not found');
         if (product.stock < item.quantity)
-          throw new BadRequestException('Insufficient stock');
+          throw new BadRequestException('Out of stock');
 
         product.stock -= item.quantity;
         await this.productRepo.save(product);
+        await this.orderRepo.save({
+          id: shortid(),
+          user,
+          product: product.id as never,
+          status: 'PENDING',
+          quantity: item.quantity,
+        });
       }
+      return { message: 'Order place successfully' };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 }
