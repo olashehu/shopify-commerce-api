@@ -6,8 +6,13 @@ export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  getProducts(@Query('page') page: number, @Query('limit') limit: number) {
-    return this.productsService.getAllProduct(page, limit);
+  getProducts(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('category') category?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.productsService.getAllProduct(page, limit, category, search);
   }
 
   @Get(':id')

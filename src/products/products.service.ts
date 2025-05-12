@@ -64,31 +64,49 @@ export class ProductsService implements OnModuleInit {
     }
   }
 
-  async getAllProduct(page: number, limit: number) {
+  async getAllProduct(
+    page?: number,
+    limit?: number,
+    category?: string,
+    search?: string,
+  ) {
     try {
-      const currentPage = page || 1;
-      const offset = limit || 10;
-      const [products, total, categories] = await Promise.all([
-        this.productsRepo.find({
-          skip: (currentPage - 1) * limit,
-          take: offset,
-        }),
-        this.productsRepo.count(),
-        this.productsRepo
-          .createQueryBuilder('prod')
-          .select('prod.category', 'category')
-          .distinct(true)
-          .orderBy('prod.category', 'ASC')
-          .getRawMany(),
-      ]);
+      const query = this.productsRepo.createQueryBuilder('product');
+
+      if (category) {
+        query.andWhere('product.category = :category', { category });
+      }
+
+      if (search) {
+        query.andWhere(
+          '(product.name ILIKE :search OR product.description ILIKE :search)',
+          { search: `${search}%` },
+        );
+      }
+
+      const total = await query.getCount();
+
+      if (page && limit) {
+        const offset = (page - 1) * limit;
+        query.skip(offset).take(limit);
+      }
+
+      const products = await query.getMany();
+
+      const categories = await this.productsRepo
+        .createQueryBuilder('prod')
+        .select('prod.category', 'category')
+        .distinct(true)
+        .orderBy('prod.category', 'ASC')
+        .getRawMany();
 
       return {
         data: products,
         pagination: {
           total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
+          page: page || 1,
+          limit: limit || total,
+          totalPages: limit ? Math.ceil(total / limit) : 1,
         },
         categories,
       };
