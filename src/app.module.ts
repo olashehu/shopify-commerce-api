@@ -18,11 +18,12 @@ dotenv.config();
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.HOST,
-      port: Number(process.env.DATABASE_PORT) || 5432,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
+      // host: process.env.HOST,
+      url: process.env.DATABASE_URL,
+      // port: Number(process.env.DATABASE_PORT) || 5432,
+      // username: process.env.DATABASE_USERNAME,
+      // password: process.env.DATABASE_PASSWORD,
+      // database: process.env.DATABASE_NAME,
       logging: true,
       entities: [path.join(__dirname, '**', '*.model.{js,ts}')],
       synchronize: true,
