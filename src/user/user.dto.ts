@@ -6,7 +6,6 @@ import {
   IsBoolean,
   IsPhoneNumber,
   IsEnum,
-  // MinLength,
 } from 'class-validator';
 import { UserRole } from './user.model';
 
@@ -23,7 +22,7 @@ export class UserDTO {
   @IsEmail()
   email: string;
 
-  @IsPhoneNumber()
+  @IsPhoneNumber('NG')
   @IsString()
   phoneNumber: string;
 

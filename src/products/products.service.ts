@@ -3,9 +3,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import axios from 'axios';
-import * as shortid from 'shortid';
-import { RawProductFromAPI, SelectedProductDTO } from './products.dto';
+// import axios from 'axios';
+// import * as shortid from 'shortid';
+// import { RawProductFromAPI, SelectedProductDTO } from './products.dto';
 import { ProductsModel } from './products.model';
 
 @Injectable()
@@ -18,51 +18,51 @@ export class ProductsService implements OnModuleInit {
     this.productsRepo = this.entityManager.getRepository(ProductsModel);
   }
 
-  async onModuleInit() {
+  onModuleInit() {
     console.log('Seeding data on startup...');
-    await this.seedProducts();
+    // await this.seedProducts();
   }
 
-  private async seedProducts(): Promise<void> {
-    try {
-      const response = await axios.get<{ products: RawProductFromAPI[] }>(
-        'https://dummyjson.com/products?limit=190',
-      );
+  // private async seedProducts(): Promise<void> {
+  //   try {
+  //     const response = await axios.get<{ products: RawProductFromAPI[] }>(
+  //       'https://dummyjson.com/products?limit=190',
+  //     );
 
-      const products = response.data.products;
+  //     const products = response.data.products;
 
-      for (const product of products) {
-        if (Object.keys(product).length === 0) {
-          continue;
-        }
+  //     for (const product of products) {
+  //       if (Object.keys(product).length === 0) {
+  //         continue;
+  //       }
 
-        const newProduct: SelectedProductDTO = {
-          name: product.title,
-          description: product.description,
-          category: product.category,
-          price: product.price,
-          stock: product.stock,
-          status: product.availabilityStatus,
-          images: product.images,
-        };
+  //       const newProduct: SelectedProductDTO = {
+  //         name: product.title,
+  //         description: product.description,
+  //         category: product.category,
+  //         price: product.price,
+  //         stock: product.stock,
+  //         status: product.availabilityStatus,
+  //         images: product.images,
+  //       };
 
-        const existingProduct = await this.productsRepo.findOne({
-          where: { name: newProduct.name },
-        });
+  //       const existingProduct = await this.productsRepo.findOne({
+  //         where: { name: newProduct.name },
+  //       });
 
-        if (existingProduct) {
-          console.warn(`Product "${existingProduct.name}" already exists.`);
-          continue;
-        }
-        await this.productsRepo.save({
-          id: shortid(),
-          ...newProduct,
-        });
-      }
-    } catch (error: unknown) {
-      console.error('Error seeding users:', error);
-    }
-  }
+  //       if (existingProduct) {
+  //         console.warn(`Product "${existingProduct.name}" already exists.`);
+  //         continue;
+  //       }
+  //       await this.productsRepo.save({
+  //         id: shortid(),
+  //         ...newProduct,
+  //       });
+  //     }
+  //   } catch (error: unknown) {
+  //     console.error('Error seeding users:', error);
+  //   }
+  // }
 
   async getAllProduct(
     page?: number,

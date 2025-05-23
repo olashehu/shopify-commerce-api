@@ -43,6 +43,8 @@ export class AuthService {
       const payload = {
         sub: user.id,
         username: user.userName,
+        email: user.email,
+        phone: user.phoneNumber,
         role: user.role,
       };
       return {
@@ -95,7 +97,13 @@ export class AuthService {
         return { status: 400, error: 'Email or password not match' };
       }
 
-      const payload = { sub: isEmail.id, username: isEmail.userName };
+      const payload = {
+        sub: isEmail.id,
+        username: isEmail.userName,
+        email: isEmail.email,
+        phone: isEmail.phoneNumber,
+        role: isEmail.role,
+      };
       return {
         access_token: await this.jwtService.signAsync(payload),
       };
