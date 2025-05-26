@@ -32,32 +32,22 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     const { email, phoneNumber, password } = req.body as never;
+
     const [isEmail, isPhoneNumber] = await Promise.all([
-      this.userRepository.findOne({
-        where: {
-          email,
-        },
-      }),
-      this.userRepository.findOne({
-        where: {
-          phoneNumber,
-        },
-      }),
+      this.userRepository.findOne({ where: { email } }),
+      this.userRepository.findOne({ where: { phoneNumber } }),
     ]);
 
-    if (isEmail) {
+    if (isEmail || isPhoneNumber) {
       return res
         .status(HttpStatus.CONFLICT)
-        .json({ error: 'email or phone number already exist' });
-    } else if (isPhoneNumber) {
-      return res
-        .status(HttpStatus.CONFLICT)
-        .json({ error: 'email or phone number already exist' });
-    } else {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      req.body.password = hashedPassword;
-      next();
+        .json({ error: 'Email or phone number already exist' });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    req.body.password = hashedPassword;
+
+    next();
   }
 }
