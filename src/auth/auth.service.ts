@@ -5,10 +5,10 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import * as shortid from 'shortid';
 import { User } from 'src/user/user.model';
-import { UserDTO } from 'src/user/user.dto';
+import { LoginDto, UserDTO } from 'src/user/user.dto';
 import { UserRole } from 'src/user/user.model';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class AuthService {
     }
   }
 
-  async signIn(loginDto: { email: string; password: string }) {
+  async signIn(loginDto: LoginDto) {
     try {
       const { email, password } = loginDto;
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -94,7 +94,13 @@ export class AuthService {
       );
 
       if (!isMatch) {
-        return { status: 400, error: 'Email or password not match' };
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'Email or password not match',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const payload = {
@@ -107,8 +113,19 @@ export class AuthService {
       return {
         access_token: await this.jwtService.signAsync(payload),
       };
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      console.error('Unexpected error during sign-in:', err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

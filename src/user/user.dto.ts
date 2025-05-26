@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsPhoneNumber,
   IsEnum,
+  MinLength,
 } from 'class-validator';
 import { UserRole } from './user.model';
 
@@ -31,10 +32,20 @@ export class UserDTO {
   role: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsString({ message: 'Password is required' })
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
   password: string;
 
   @IsOptional()
   @IsBoolean()
   isActive: boolean;
+}
+
+export class LoginDto {
+  @IsEmail({}, { message: 'Email must be valid' })
+  email: string;
+
+  @IsString({ message: 'Password is required' })
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  password: string;
 }
