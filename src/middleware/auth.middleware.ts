@@ -23,6 +23,7 @@ export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const dtoObject = plainToInstance(UserDTO, req.body);
     const errors = await validate(dtoObject);
+    console.log(errors, 'error');
 
     if (errors.length < 0) {
       const messages = errors
